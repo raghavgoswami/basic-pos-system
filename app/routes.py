@@ -25,7 +25,7 @@ def create_menu_item():
         )
         db.session.add(item)
         db.session.commit()
-        flash("Successfully Added Menu Item: {}".format(form.description.data))
+        flash(f"Successfully Added Menu Item: {form.description.data}")
         return redirect(url_for("index"))
     return render_template("create-menu-item.html", form=form)
 
@@ -51,7 +51,7 @@ def update_menu_item(item_id):
                 else item.price
             )
             db.session.commit()
-            flash("Successfully Updated Menu Item: {}".format(form.description.data))
+            flash(f"Successfully Updated Menu Item: {form.description.data}")
             return redirect(url_for("index"))
 
     return render_template("update-menu-item.html", form=form, item=item)
@@ -65,7 +65,7 @@ def delete_menu_item(item_id):
         if item:
             db.session.delete(item)
             db.session.commit()
-            flash("Successfully Deleted Menu Item: {}".format(item.description))
+            flash(f"Successfully Deleted Menu Item: {item.description}")
             return redirect(url_for("index"))
     return render_template("delete-menu-item.html", form=form, item=item)
 
@@ -109,7 +109,7 @@ def create_order():
 
         db.session.add(order)
         db.session.commit()
-        flash("Successfully Added Order #{} and Updated Menu".format(order.id))
+        flash(f"Successfully Added Order #{order.id} and Updated Menu")
 
         return redirect(url_for("index"))
 
