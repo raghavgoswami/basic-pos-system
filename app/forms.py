@@ -1,10 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import (
-    StringField,
-    SubmitField,
-    DecimalField,
-    IntegerField,
-)
+from wtforms import IntegerField, StringField, SubmitField
 from wtforms.validators import DataRequired, NumberRange, Regexp
 
 
@@ -46,5 +41,7 @@ class DeleteMenuItemForm(FlaskForm):
 
 class CreateOrderForm(FlaskForm):
     note = StringField("Note", validators=[DataRequired()])
-    item_id_and_quantity_str = StringField("Item Id and Quantity String", validators=[DataRequired()])
+    item_id_and_quantity_str = StringField(
+        "Item Id and Quantity String", validators=[DataRequired()]
+    )
     submit = SubmitField("Submit Order")

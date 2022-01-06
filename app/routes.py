@@ -1,11 +1,8 @@
-from flask import render_template, flash, redirect, url_for
+from flask import flash, redirect, render_template, url_for
+
 from app import app, db
-from app.forms import (
-    CreateMenuItemForm,
-    UpdateMenuItemForm,
-    DeleteMenuItemForm,
-    CreateOrderForm,
-)
+from app.forms import (CreateMenuItemForm, CreateOrderForm, DeleteMenuItemForm,
+                       UpdateMenuItemForm)
 from app.models import Item, Order
 
 
@@ -25,7 +22,7 @@ def create_menu_item():
         item = Item(
             description=form.description.data,
             quantity=form.quantity.data,
-            price=form.price.data,
+            price="{:.2f}".format(float(form.price.data)),
         )
         db.session.add(item)
         db.session.commit()
@@ -50,7 +47,11 @@ def update_menu_item(item_id):
             item.quantity = (
                 form.quantity.data if form.quantity.data != None else item.quantity
             )
-            item.price = form.price.data if form.price.data != None else item.price
+            item.price = (
+                "{:.2f}".format(float(form.price.data))
+                if form.price.data != None
+                else item.price
+            )
             db.session.commit()
             flash("Successfully Updated Menu Item: {}".format(form.description.data))
             return redirect(url_for("index"))
