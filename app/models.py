@@ -67,4 +67,3 @@ class Order(db.Model):
                     item=item, order=self, quantity_in_order=quantity
                 )
             )
-        db.session.commit()
