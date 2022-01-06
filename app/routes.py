@@ -18,7 +18,6 @@ def index():
 def create_menu_item():
     form = CreateMenuItemForm()
     if form.validate_on_submit():
-
         item = Item(
             description=form.description.data,
             quantity=form.quantity.data,
@@ -26,7 +25,6 @@ def create_menu_item():
         )
         db.session.add(item)
         db.session.commit()
-
         flash("Successfully Added Menu Item: {}".format(form.description.data))
         return redirect(url_for("index"))
     return render_template("create-menu-item.html", form=form)
@@ -82,25 +80,26 @@ def create_order():
         for item_id_and_quantity in str(form.item_id_and_quantity_str.data).split(","):
             item_id, quantity_ordered = item_id_and_quantity.split(":")
             item_id = item_id.strip()
-            item = Item.query.get(item_id)
+            quantity_ordered = int(quantity_ordered.strip())
 
+            item = Item.query.get(item_id)
             if item is None:
                 flash(f"Item # {item_id} does not exist")
                 return render_template("create-order.html", form=form)
 
-            quantity_ordered = quantity_ordered.strip()
+            if quantity_ordered < 1:
+                flash(f"Item # {item_id} quantity ordered must be >= 1")
+                return render_template("create-order.html", form=form)
 
-            item_id_and_quantity_list.append(f"Item #{item_id} x {quantity_ordered}")
-
-            quantity_left = item.quantity
-            if quantity_left < int(quantity_ordered):
+            if quantity_ordered > item.quantity:
                 flash(
-                    f"You ordered Item # {item_id} x {quantity_ordered} but there are only {quantity_left} available"
+                    f"You ordered Item # {item_id} x {quantity_ordered} but there are only {item.quantity} available"
                 )
                 return render_template("create-order.html", form=form)
-            else:
-                item.quantity -= int(quantity_ordered)
-                payment_amount += float(item.price) * float(quantity_ordered)
+
+            item_id_and_quantity_list.append(f"Item #{item_id} x {quantity_ordered}")
+            item.quantity -= quantity_ordered
+            payment_amount += float(item.price) * float(quantity_ordered)
 
         order = Order(
             note=form.note.data,
