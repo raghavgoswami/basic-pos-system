@@ -1,0 +1,29 @@
+{% extends "base.html" %} {% block content %}
+<h1>Create Menu Item Form</h1>
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.description.label }}<br />
+    {{ form.description() }}<br />
+    {% for error in form.description.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+
+  <p>
+    {{ form.price.label }}<br />
+    {{ form.price() }}<br />
+    {% for error in form.price.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.quantity.label }}<br />
+    {{ form.quantity() }}<br />
+    {% for error in form.quantity.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

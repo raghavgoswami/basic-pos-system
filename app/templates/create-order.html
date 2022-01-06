@@ -1,0 +1,23 @@
+{% extends "base.html" %} {% block content %}
+<h1>Create Order Form</h1>
+<form action="" method="post" novalidate>
+  {{ form.hidden_tag() }}
+  <p>
+    {{ form.note.label }}<br />
+    {{ form.note() }}<br />
+    {% for error in form.note.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>
+    {{ form.item_id_and_quantity_str.label }}<br />
+    <em>Example Input: "1:2, 3:4" (translates to Item #1 x 2, Item #3 x 4)</em
+    ><br />
+    {{ form.item_id_and_quantity_str() }}<br />
+    {% for error in form.item_id_and_quantity_str.errors %}
+    <span style="color: red">[{{ error }}]</span>
+    {% endfor %}
+  </p>
+  <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

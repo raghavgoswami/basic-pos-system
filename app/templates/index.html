@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% block content %}
+<h1>Basic POS System</h1>
+<style>
+  table,
+  th,
+  td {
+    border: 1px solid black;
+  }
+  tr:hover {
+    background-color: yellow;
+  }
+</style>
+<h2>Current Menu</h2>
+<table style="width: 50%">
+  <thead style="vertical-align: top">
+    <tr>
+      <th>Item Id</th>
+      <th>Description</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td>{{ item.id }}</td>
+      <td>{{ item.description }}</td>
+      <td>${{ item.price }}</td>
+      <td>{{ item.quantity }}</td>
+      <td>
+        <a href="{{ url_for('update_menu_item', item_id = item.id) }}">Edit</a>
+        <a href="{{ url_for('delete_menu_item', item_id = item.id) }}"
+          >Delete</a
+        >
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Current Orders</h2>
+<table style="width: 50%">
+  <thead style="vertical-align: top">
+    <tr>
+      <th>Order Id</th>
+      <th>Payment Amount</th>
+      <th>Note</th>
+      <th>Item Ids and Quantity List</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+    <tr>
+      <td>{{ order.id }}</td>
+      <td>${{ order.payment_amount }}</td>
+      <td>{{ order.note }}</td>
+      <td>{{ order.item_id_and_quantity_str}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
