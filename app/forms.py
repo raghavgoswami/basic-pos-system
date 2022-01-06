@@ -46,7 +46,5 @@ class DeleteMenuItemForm(FlaskForm):
 
 class CreateOrderForm(FlaskForm):
     note = StringField("Note", validators=[DataRequired()])
-    item_id_and_quantity_str = StringField(
-        "Item Id and Quantity String", validators=[DataRequired()], description="e.g. Write \"1:2, 2:1\" to express Item # 1 x 2, Item #2 x 1"
-    )
+    item_id_and_quantity_str = StringField("Item Id and Quantity String", validators=[DataRequired()])
     submit = SubmitField("Submit Order")
