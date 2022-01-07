@@ -77,14 +77,13 @@ def create_order():
         if form.validate_on_submit():
             payment_amount = 0
             item_id_and_quantity_list = []
-
+            order = Order(note=form.note.data)
             for item_id_and_quantity in str(form.item_id_and_quantity_str.data).split(
                 ","
             ):
                 item_id, quantity_ordered = item_id_and_quantity.split(":")
                 item_id = item_id.strip()
-                quantity_ordered = int(quantity_ordered.strip())
-
+                quantity_ordered = int(quantity_ordered)
                 item = Item.query.get(item_id)
                 if item is None:
                     flash(f"Item # {item_id} does not exist")
@@ -100,22 +99,19 @@ def create_order():
                     )
                     return render_template("create-order.html", form=form)
 
+                order.add_items([(item, quantity_ordered)])
                 item_id_and_quantity_list.append(
-                    f"Item #{item_id} x {quantity_ordered}"
+                    f"Item #{item.id} x {quantity_ordered}"
                 )
                 item.quantity -= quantity_ordered
                 payment_amount += float(item.price) * float(quantity_ordered)
 
-            order = Order(
-                note=form.note.data,
-                payment_amount="{:.2f}".format(float(payment_amount)),
-                item_id_and_quantity_str=(", ").join(item_id_and_quantity_list),
-            )
+            order.payment_amount = "{:.2f}".format(float(payment_amount))
+            order.item_id_and_quantity_str = (", ").join(item_id_and_quantity_list)
 
             db.session.add(order)
             db.session.commit()
             flash(f"Successfully Added Order #{order.id} and Updated Menu")
-
             return redirect(url_for("index"))
 
         return render_template("create-order.html", form=form)

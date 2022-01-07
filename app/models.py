@@ -20,8 +20,8 @@ class Order_Item_Association(db.Model):
         self.quantity_in_order = quantity_in_order
 
     def __repr__(self):
-        return "<Order{}Item{}Quant{}".format(
-            self.order_id, self.item, self.quantity_in_order
+        return "<Order{}Item{}Quantity{}>".format(
+            self.order_id, self.item_id, self.quantity_in_order
         )
 
 
@@ -49,7 +49,7 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     payment_amount = db.Column(db.String(140))
     note = db.Column(db.String(140))
-    item_id_and_quantity_str = db.Column(db.String(140))
+    item_id_and_quantity_str = db.Column(db.String())
     items = db.relationship("Order_Item_Association", back_populates="order")
 
     def __init__(self, note=None, payment_amount=None, item_id_and_quantity_str=None):

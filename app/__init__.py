@@ -43,5 +43,9 @@ pizza_order, burger_order = [
         item_id_and_quantity_str="Item #2 x 2",
     ),
 ]
+
+pizza_order.add_items([(pizza, 1)])
+burger_order.add_items([(burger, 2)])
+
 db.session.add_all([pizza, burger, salad, pizza_order, burger_order])
 db.session.commit()
