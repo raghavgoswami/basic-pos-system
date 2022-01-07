@@ -3,8 +3,8 @@ from flask import flash, redirect, render_template, url_for
 from app import app, db
 from app.forms import (CreateMenuItemForm, CreateOrderForm, DeleteMenuItemForm,
                        UpdateMenuItemForm)
+from app.helpers import is_valid_quantity_ordered
 from app.models import Item, Order
-from app.utils import is_valid_quantity_ordered
 
 
 @app.route("/")
