@@ -32,7 +32,9 @@ class Item(db.Model):
     description = db.Column(db.String(140))
     price = db.Column(db.String(140))
     quantity = db.Column(db.Integer)
-    orders = db.relationship("Order_Item_Association", back_populates="item")
+    orders = db.relationship(
+        "Order_Item_Association", back_populates="item", cascade="all, delete-orphan"
+    )
 
     def __init__(self, description=None, price=None, quantity=None):
         self.description = description
@@ -50,7 +52,9 @@ class Order(db.Model):
     payment_amount = db.Column(db.String(140))
     note = db.Column(db.String(140))
     item_id_and_quantity_str = db.Column(db.String())
-    items = db.relationship("Order_Item_Association", back_populates="order")
+    items = db.relationship(
+        "Order_Item_Association", back_populates="order", cascade="all, delete-orphan"
+    )
 
     def __init__(self, note=None, payment_amount=None, item_id_and_quantity_str=None):
         self.note = note

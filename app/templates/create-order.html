@@ -11,7 +11,7 @@
   </p>
   <p>
     {{ form.item_id_and_quantity_str.label }}<br />
-    <em>Example Input: "1:2, 3:4" (translates to Item #1 x 2, Item #3 x 4)</em
+    <em>Example Input: "1x2, 3x4" (translates to Item #1 x 2, Item #3 x 4)</em
     ><br />
     {{ form.item_id_and_quantity_str() }}<br />
     {% for error in form.item_id_and_quantity_str.errors %}

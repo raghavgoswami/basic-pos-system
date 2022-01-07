@@ -4,6 +4,7 @@ from app import app, db
 from app.forms import (CreateMenuItemForm, CreateOrderForm, DeleteMenuItemForm,
                        UpdateMenuItemForm)
 from app.models import Item, Order
+from app.utils import is_valid_quantity_ordered
 
 
 @app.route("/")
@@ -74,47 +75,38 @@ def delete_menu_item(item_id):
 def create_order():
     try:
         form = CreateOrderForm()
-        if form.validate_on_submit():
-            payment_amount = 0
-            item_id_and_quantity_list = []
-            order = Order(note=form.note.data)
-            for item_id_and_quantity in str(form.item_id_and_quantity_str.data).split(
-                ","
-            ):
-                item_id, quantity_ordered = item_id_and_quantity.split(":")
-                item_id = item_id.strip()
-                quantity_ordered = int(quantity_ordered)
-                item = Item.query.get(item_id)
-                if item is None:
-                    flash(f"Item # {item_id} does not exist")
-                    return render_template("create-order.html", form=form)
+        if not form.validate_on_submit():
+            return render_template("create-order.html", form=form)
 
-                if quantity_ordered < 1:
-                    flash(f"Item # {item_id} quantity ordered must be >= 1")
-                    return render_template("create-order.html", form=form)
+        payment_amount = 0
+        item_id_and_quantity_list = []
+        order = Order(note=form.note.data)
 
-                if quantity_ordered > item.quantity:
-                    flash(
-                        f"You ordered Item # {item_id} x {quantity_ordered} but there are only {item.quantity} available"
-                    )
-                    return render_template("create-order.html", form=form)
+        for item_id_and_quantity in str(form.item_id_and_quantity_str.data).split(","):
+            item_id, quantity_ordered = item_id_and_quantity.split("x")
+            item_id, quantity_ordered = int(item_id), int(quantity_ordered)
 
-                order.add_items([(item, quantity_ordered)])
-                item_id_and_quantity_list.append(
-                    f"Item #{item.id} x {quantity_ordered}"
-                )
-                item.quantity -= quantity_ordered
-                payment_amount += float(item.price) * float(quantity_ordered)
+            item = Item.query.get(item_id)
+            if item is None:
+                flash(f"Item # '{item_id}' is not a valid Item Id")
+                return render_template("create-order.html", form=form)
 
-            order.payment_amount = "{:.2f}".format(float(payment_amount))
-            order.item_id_and_quantity_str = (", ").join(item_id_and_quantity_list)
+            if not is_valid_quantity_ordered(item, quantity_ordered):
+                return render_template("create-order.html", form=form)
+            item.quantity -= quantity_ordered
+            payment_amount += float(item.price) * float(quantity_ordered)
 
-            db.session.add(order)
-            db.session.commit()
-            flash(f"Successfully Added Order #{order.id} and Updated Menu")
-            return redirect(url_for("index"))
+            order.add_items([(item, quantity_ordered)])
+            item_id_and_quantity_list.append(f"Item #{item.id} x {quantity_ordered}")
 
-        return render_template("create-order.html", form=form)
+        order.payment_amount = "{:.2f}".format(float(payment_amount))
+        order.item_id_and_quantity_str = (", ").join(item_id_and_quantity_list)
+
+        db.session.add(order)
+        db.session.commit()
+        flash(f"Successfully Added Order #{order.id} and Updated Menu")
+        return redirect(url_for("index"))
+
     except Exception as e:
         flash(f"Something went wrong while creating order. Error message: {e}")
         db.session.rollback()
