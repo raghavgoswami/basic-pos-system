@@ -12,63 +12,63 @@ from app.models import Item, Order
 def index():
     items = db.session.query(Item).all()
     orders = db.session.query(Order).all()
-    return render_template("index.html", items=items, orders=orders)
+    return render_template("index.html", items=items, orders=orders), 200
 
 
 @app.route("/item", methods=["GET", "POST"])
 def create_menu_item():
     form = CreateMenuItemForm()
-    if form.validate_on_submit():
-        item = Item(
-            description=form.description.data,
-            quantity=form.quantity.data,
-            price="{:.2f}".format(float(form.price.data)),
-        )
-        db.session.add(item)
-        db.session.commit()
-        flash(f"Successfully Added Menu Item: {form.description.data}")
-        return redirect(url_for("index"))
-    return render_template("create-menu-item.html", form=form)
+    if not form.validate_on_submit():
+        return render_template("create-menu-item.html", form=form), 200
+
+    item = Item(
+        description=form.description.data,
+        quantity=form.quantity.data,
+        price="{:.2f}".format(float(form.price.data)),
+    )
+    db.session.add(item)
+    db.session.commit()
+    flash(f"Successfully Added Menu Item: {form.description.data}")
+    return redirect(url_for("index")), 302
 
 
 @app.route("/item/<item_id>/update", methods=["GET", "POST"])
 def update_menu_item(item_id):
     item = Item.query.filter_by(id=item_id).first()
     form = UpdateMenuItemForm()
-    if form.validate_on_submit():
-        item = Item.query.filter_by(id=item_id).first()
-        if item:
-            item.description = (
-                form.description.data
-                if form.description.data != None
-                else item.description
-            )
-            item.quantity = (
-                form.quantity.data if form.quantity.data != None else item.quantity
-            )
-            item.price = (
-                "{:.2f}".format(float(form.price.data))
-                if form.price.data != None
-                else item.price
-            )
-            db.session.commit()
-            flash(f"Successfully Updated Menu Item: {form.description.data}")
-            return redirect(url_for("index"))
+    if not form.validate_on_submit():
+        return render_template("update-menu-item.html", form=form, item=item), 200
 
-    return render_template("update-menu-item.html", form=form, item=item)
+    item = Item.query.filter_by(id=item_id).first()
+    if item:
+        item.description = (
+            form.description.data if form.description.data != None else item.description
+        )
+        item.quantity = (
+            form.quantity.data if form.quantity.data != None else item.quantity
+        )
+        item.price = (
+            "{:.2f}".format(float(form.price.data))
+            if form.price.data != None
+            else item.price
+        )
+        db.session.commit()
+        flash(f"Successfully Updated Menu Item: {form.description.data}"),
+        return redirect(url_for("index")), 302
 
 
 @app.route("/item/<item_id>/delete", methods=["GET", "POST"])
 def delete_menu_item(item_id):
     item = Item.query.filter_by(id=item_id).first()
     form = DeleteMenuItemForm()
-    if form.validate_on_submit():
-        if item:
-            db.session.delete(item)
-            db.session.commit()
-            flash(f"Successfully Deleted Menu Item: {item.description}")
-            return redirect(url_for("index"))
-    return render_template("delete-menu-item.html", form=form, item=item)
+    if not form.validate_on_submit():
+        return render_template("delete-menu-item.html", form=form, item=item), 200
+
+    if item:
+        db.session.delete(item)
+        db.session.commit()
+        flash(f"Successfully Deleted Menu Item: {item.description}")
+        return redirect(url_for("index")), 302
 
 
 @app.route("/order", methods=["GET", "POST"])
@@ -76,7 +76,7 @@ def create_order():
     try:
         form = CreateOrderForm()
         if not form.validate_on_submit():
-            return render_template("create-order.html", form=form)
+            return render_template("create-order.html", form=form), 200
 
         payment_amount = 0
         item_id_and_quantity_list = []
@@ -105,9 +105,9 @@ def create_order():
         db.session.add(order)
         db.session.commit()
         flash(f"Successfully Added Order #{order.id} and Updated Menu")
-        return redirect(url_for("index"))
+        return redirect(url_for("index")), 302
 
     except Exception as e:
         flash(f"Something went wrong while creating order. Error message: {e}")
         db.session.rollback()
-        return render_template("create-order.html", form=form)
+        return render_template("create-order.html", form=form), 400
