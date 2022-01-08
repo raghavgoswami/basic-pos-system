@@ -89,10 +89,10 @@ def create_order():
             item = Item.query.get(item_id)
             if item is None:
                 flash(f"Item # '{item_id}' is not a valid Item Id")
-                return render_template("create-order.html", form=form)
+                return render_template("create-order.html", form=form), 400
 
             if not is_valid_quantity_ordered(item, quantity_ordered):
-                return render_template("create-order.html", form=form)
+                return render_template("create-order.html", form=form), 400
             item.quantity -= quantity_ordered
             payment_amount += float(item.price) * float(quantity_ordered)
 
